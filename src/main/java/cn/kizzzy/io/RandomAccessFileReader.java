@@ -3,7 +3,7 @@ package cn.kizzzy.io;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
-public class RandomAccessFileReader extends FullyReader implements IFullyReader {
+public class RandomAccessFileReader extends FullyReader {
     
     private final RandomAccessFile file;
     
