@@ -3,12 +3,12 @@ package cn.kizzzy.io;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ZipInputStreamReader extends FullyReader {
+public class InputStreamReader extends FullyReader {
     
     private final InputStream in;
     private final long size;
     
-    public ZipInputStreamReader(InputStream inputStream, long size) {
+    public InputStreamReader(InputStream inputStream, long size) {
         this.in = inputStream;
         this.size = size;
     }

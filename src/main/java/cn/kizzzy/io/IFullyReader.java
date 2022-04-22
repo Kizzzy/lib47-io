@@ -66,6 +66,14 @@ public interface IFullyReader extends DataInput {
         return (ch != 0);
     }
     
+    default boolean[] readBooleans(int count) throws IOException {
+        boolean[] arr = new boolean[count];
+        for (int i = 0; i < count; ++i) {
+            arr[i] = readBoolean();
+        }
+        return arr;
+    }
+    
     @Override
     default byte readByte() throws IOException {
         int ch = read();
@@ -260,9 +268,37 @@ public interface IFullyReader extends DataInput {
         return ((long) (readInt()) << 32) + (readInt() & 0xFFFFFFFFL);
     }
     
+    default long[] readLongs(int count) throws IOException {
+        long[] arr = new long[count];
+        for (int i = 0, n = arr.length; i < n; ++i) {
+            arr[i] = readLong();
+        }
+        return arr;
+    }
+    
+    default long readLongEx() throws IOException {
+        return ((long) (readIntEx()) << 32) + (readIntEx() & 0xFFFFFFFFL);
+    }
+    
+    default long[] readLongExs(int count) throws IOException {
+        long[] arr = new long[count];
+        for (int i = 0, n = arr.length; i < n; ++i) {
+            arr[i] = readLongEx();
+        }
+        return arr;
+    }
+    
     @Override
     default float readFloat() throws IOException {
         return Float.intBitsToFloat(readInt());
+    }
+    
+    default float[] readFloats(int count) throws IOException {
+        float[] arr = new float[count];
+        for (int i = 0, n = arr.length; i < n; ++i) {
+            arr[i] = readFloat();
+        }
+        return arr;
     }
     
     /**
@@ -274,9 +310,37 @@ public interface IFullyReader extends DataInput {
         return Float.intBitsToFloat(readIntEx());
     }
     
+    default float[] readFloatExs(int count) throws IOException {
+        float[] arr = new float[count];
+        for (int i = 0, n = arr.length; i < n; ++i) {
+            arr[i] = readFloatEx();
+        }
+        return arr;
+    }
+    
     @Override
     default double readDouble() throws IOException {
         return Double.longBitsToDouble(readLong());
+    }
+    
+    default double[] readDoubles(int count) throws IOException {
+        double[] arr = new double[count];
+        for (int i = 0, n = arr.length; i < n; ++i) {
+            arr[i] = readDouble();
+        }
+        return arr;
+    }
+    
+    default double readDoubleEx() throws IOException {
+        return Double.longBitsToDouble(readLongEx());
+    }
+    
+    default double[] readDoubleExs(int count) throws IOException {
+        double[] arr = new double[count];
+        for (int i = 0, n = arr.length; i < n; ++i) {
+            arr[i] = readDoubleEx();
+        }
+        return arr;
     }
     
     @Override
