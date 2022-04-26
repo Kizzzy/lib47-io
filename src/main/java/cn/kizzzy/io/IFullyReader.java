@@ -200,8 +200,8 @@ public interface IFullyReader extends DataInput {
         return ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
     }
     
-    default long[] readInts(int count) throws IOException {
-        long[] arr = new long[count];
+    default int[] readInts(int count) throws IOException {
+        int[] arr = new int[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
             arr[i] = readInt();
         }
@@ -238,8 +238,8 @@ public interface IFullyReader extends DataInput {
         return ((ch1 << 0) + (ch2 << 8) + (ch3 << 16) + (ch4 << 24));
     }
     
-    default long[] readIntExs(int count) throws IOException {
-        long[] arr = new long[count];
+    default int[] readIntExs(int count) throws IOException {
+        int[] arr = new int[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
             arr[i] = readIntEx();
         }
