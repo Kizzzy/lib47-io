@@ -7,15 +7,17 @@ public class XorOutputStream extends OutputStream {
     
     private final OutputStream out;
     
-    private final int key;
+    private final byte[] keys;
     
-    public XorOutputStream(OutputStream out, int key) {
+    private int index;
+    
+    public XorOutputStream(OutputStream out, byte... keys) {
         this.out = out;
-        this.key = key;
+        this.keys = keys;
     }
     
     @Override
     public void write(int b) throws IOException {
-        out.write(b ^ key);
+        out.write(b ^ keys[(index++) % keys.length]);
     }
 }
