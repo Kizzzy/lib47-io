@@ -47,4 +47,9 @@ public class RandomAccessFileReader extends FullyReader {
                 break;
         }
     }
+    
+    @Override
+    public void close() throws IOException {
+        file.close();
+    }
 }

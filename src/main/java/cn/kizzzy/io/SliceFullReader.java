@@ -71,4 +71,9 @@ public class SliceFullReader extends FullyReader {
         }
         parent.seek(currentInParent, SeekType.BEGIN);
     }
+    
+    @Override
+    public void close() throws IOException {
+        parent.close();
+    }
 }

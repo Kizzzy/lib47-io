@@ -1,5 +1,6 @@
 package cn.kizzzy.io;
 
+import java.io.Closeable;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -8,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * Ex suffix means method will handle bytes in LITTLE_ENDIAN
  */
-public interface IFullyWriter extends DataOutput {
+public interface IFullyWriter extends DataOutput, Closeable {
     
     @Override
     default void writeBoolean(boolean v) throws IOException {

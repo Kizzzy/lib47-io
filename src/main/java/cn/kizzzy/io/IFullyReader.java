@@ -1,5 +1,6 @@
 package cn.kizzzy.io;
 
+import java.io.Closeable;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -7,7 +8,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-public interface IFullyReader extends DataInput {
+public interface IFullyReader extends DataInput, Closeable {
     
     long length() throws IOException;
     

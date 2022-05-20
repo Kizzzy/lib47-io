@@ -15,4 +15,9 @@ public class OutputStreamReader extends FullyWriter {
     public void write(int b) throws IOException {
         out.write(b);
     }
+    
+    @Override
+    public void close() throws IOException {
+        out.close();
+    }
 }

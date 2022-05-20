@@ -39,4 +39,9 @@ public class InputStreamReader extends FullyReader {
     public void seek(long pos, SeekType seekType) throws IOException {
         // todo
     }
+    
+    @Override
+    public void close() throws IOException {
+        in.close();
+    }
 }

@@ -20,4 +20,9 @@ public class RandomAccessFileWriter extends FullyWriter {
     public void write(byte[] b, int off, int len) throws IOException {
         file.write(b, off, len);
     }
+    
+    @Override
+    public void close() throws IOException {
+        file.close();
+    }
 }
