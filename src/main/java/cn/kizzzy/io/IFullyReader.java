@@ -278,7 +278,7 @@ public interface IFullyReader extends DataInput, Closeable {
     }
     
     default long readLongEx() throws IOException {
-        return ((long) (readIntEx()) << 32) + (readIntEx() & 0xFFFFFFFFL);
+        return (readIntEx() & 0xFFFFFFFFL) + (((long) readIntEx()) << 32);
     }
     
     default long[] readLongExs(int count) throws IOException {
@@ -364,14 +364,12 @@ public interface IFullyReader extends DataInput, Closeable {
     default String readString(int count, int offset, Charset charset) throws IOException {
         byte[] pathBuf = readBytes(count);
         
-        for (int m = offset; m < pathBuf.length; ++m) {
-            if (pathBuf[m] == 0) {
-                return new String(pathBuf, offset, m - offset, charset);
-            }
-            if (m == pathBuf.length - 1) {
-                return new String(pathBuf, offset, m - offset + 1, charset);
+        String s = new String(pathBuf, offset, count, charset);
+        for (int i = 0, n = s.length(); i < n; ++i) {
+            if (s.charAt(i) == 0) {
+                return s.substring(0, i);
             }
         }
-        return null;
+        return s;
     }
 }
