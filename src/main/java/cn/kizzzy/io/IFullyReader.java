@@ -5,6 +5,7 @@ import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -18,7 +19,11 @@ public interface IFullyReader extends DataInput, Closeable {
     
     int read() throws IOException;
     
-    int read(byte b[], int off, int len) throws IOException;
+    default int read(byte[] buffer) throws IOException {
+        return read(buffer, 0, buffer.length);
+    }
+    
+    int read(byte[] b, int off, int len) throws IOException;
     
     @Override
     default int skipBytes(int n) throws IOException {
@@ -372,4 +377,6 @@ public interface IFullyReader extends DataInput, Closeable {
         }
         return s;
     }
+    
+    InputStream asInputStream();
 }

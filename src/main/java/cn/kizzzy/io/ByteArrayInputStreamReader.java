@@ -2,6 +2,7 @@ package cn.kizzzy.io;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 public class ByteArrayInputStreamReader extends ByteArrayInputStream implements IFullyReader {
@@ -35,5 +36,10 @@ public class ByteArrayInputStreamReader extends ByteArrayInputStream implements 
                 this.pos += pos;
                 break;
         }
+    }
+    
+    @Override
+    public InputStream asInputStream() {
+        return this;
     }
 }

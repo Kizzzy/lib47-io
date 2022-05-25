@@ -3,6 +3,7 @@ package cn.kizzzy.io;
 import java.io.Closeable;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -222,4 +223,6 @@ public interface IFullyWriter extends DataOutput, Closeable {
     default void writeString(String s, Charset charset) throws IOException {
         write(s.getBytes(charset));
     }
+    
+    OutputStream asOutputStream();
 }
