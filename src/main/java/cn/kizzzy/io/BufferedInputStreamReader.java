@@ -1,18 +1,21 @@
 package cn.kizzzy.io;
 
-import java.io.ByteArrayInputStream;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ByteArrayInputStreamReader extends ByteArrayInputStream implements IFullyReader {
+public class BufferedInputStreamReader extends BufferedInputStream implements IFullyReader {
     
-    public ByteArrayInputStreamReader(byte[] buf) {
-        super(buf);
+    private final long size;
+    
+    public BufferedInputStreamReader(InputStream in, long size) {
+        super(in, (int) size);
+        this.size = size;
     }
     
     @Override
     public long length() throws IOException {
-        return count;
+        return size;
     }
     
     @Override
@@ -25,10 +28,8 @@ public class ByteArrayInputStreamReader extends ByteArrayInputStream implements 
         switch (seekType) {
             case BEGIN:
                 this.pos = (int) pos;
-                break;
             case CURRENT:
-                this.pos += pos;
-                break;
+                skip(pos);
         }
     }
     

@@ -8,6 +8,9 @@ public class InputStreamReader extends FullyReader {
     private final InputStream in;
     private final long size;
     
+    private long position;
+    private byte[] buffer_0 = new byte[1];
+    
     public InputStreamReader(InputStream inputStream, long size) {
         this.in = inputStream;
         this.size = size;
@@ -20,24 +23,36 @@ public class InputStreamReader extends FullyReader {
     
     @Override
     public long position() throws IOException {
-        // todo
-        return 0;
+        return position;
     }
     
     @Override
     public int read() throws IOException {
-        return in.read();
+        int n = read(buffer_0);
+        if (n > 0) {
+            return buffer_0[0];
+        }
+        return n;
     }
     
     @Override
-    public String readLine() throws IOException {
-        // todo
-        return null;
+    public int read(byte[] b, int off, int len) throws IOException {
+        int n = in.read(b, off, len);
+        if (n > 0) {
+            position += n;
+        }
+        return n;
     }
     
     @Override
     public void seek(long pos, SeekType seekType) throws IOException {
-        // todo
+        switch (seekType) {
+            case BEGIN:
+                throw new IOException("seek(begin) not support");
+            case CURRENT:
+                skip(pos);
+                break;
+        }
     }
     
     @Override

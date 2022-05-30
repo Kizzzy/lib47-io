@@ -34,18 +34,17 @@ public class SliceFullReader extends FullyReader {
     
     @Override
     public int read() throws IOException {
-        if (parent.position() != currentInParent) {
-            parent.seek(currentInParent, SeekType.BEGIN);
-        }
+        initPosition();
+        
+        int val = parent.read();
         currentInParent++;
-        return parent.read();
+        return val;
     }
     
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        if (parent.position() != currentInParent) {
-            parent.seek(currentInParent, SeekType.BEGIN);
-        }
+        initPosition();
+        
         if (currentInParent + len > endInParent) {
             len = (int) (endInParent - currentInParent);
         }
@@ -54,9 +53,10 @@ public class SliceFullReader extends FullyReader {
         return num;
     }
     
-    @Override
-    public String readLine() throws IOException {
-        return parent.readLine();
+    private void initPosition() throws IOException {
+        if (parent.position() != currentInParent) {
+            parent.seek(currentInParent, SeekType.BEGIN);
+        }
     }
     
     @Override

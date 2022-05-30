@@ -27,37 +27,6 @@ public class MappedByteBufferReader extends FullyReader {
     }
     
     @Override
-    public String readLine() throws IOException {
-        StringBuffer input = new StringBuffer();
-        int c = -1;
-        boolean eol = false;
-        
-        while (!eol) {
-            switch (c = read()) {
-                case -1:
-                case '\n':
-                    eol = true;
-                    break;
-                case '\r':
-                    eol = true;
-                    long cur = position();
-                    if ((read()) != '\n') {
-                        seek(cur, SeekType.BEGIN);
-                    }
-                    break;
-                default:
-                    input.append((char) c);
-                    break;
-            }
-        }
-        
-        if ((c == -1) && (input.length() == 0)) {
-            return null;
-        }
-        return input.toString();
-    }
-    
-    @Override
     public void seek(long pos, SeekType seekType) throws IOException {
         switch (seekType) {
             case BEGIN:

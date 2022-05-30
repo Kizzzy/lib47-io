@@ -32,11 +32,6 @@ public class RandomAccessFileReader extends FullyReader {
     }
     
     @Override
-    public String readLine() throws IOException {
-        return file.readLine();
-    }
-    
-    @Override
     public void seek(long pos, SeekType seekType) throws IOException {
         switch (seekType) {
             case BEGIN:
