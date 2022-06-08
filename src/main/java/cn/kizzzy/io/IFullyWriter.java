@@ -50,19 +50,19 @@ public interface IFullyWriter extends DataOutput, Closeable {
         write((v >>> 0) & 0xFF);
     }
     
-    default void writeShorts(int[] arr) throws IOException {
-        for (int b : arr) {
+    default void writeShorts(short[] arr) throws IOException {
+        for (short b : arr) {
             writeShort(b);
         }
     }
     
-    default void writeShortEx(int v) throws IOException {
+    default void writeShortEx(short v) throws IOException {
         write(v & 0xff);
         write((v >> 8) & 0xff);
     }
     
-    default void writeShortExs(int[] arr) throws IOException {
-        for (int b : arr) {
+    default void writeShortExs(short[] arr) throws IOException {
+        for (short b : arr) {
             writeShortEx(b);
         }
     }
@@ -78,7 +78,7 @@ public interface IFullyWriter extends DataOutput, Closeable {
     }
     
     default void writeUnsignedShortEx(int v) throws IOException {
-        writeShortEx(v);
+        writeShortEx((short) v);
     }
     
     default void writeUnsignedShortExs(int[] arr) throws IOException {

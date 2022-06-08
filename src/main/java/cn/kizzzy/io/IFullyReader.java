@@ -119,8 +119,8 @@ public interface IFullyReader extends DataInput, Closeable {
         return (short) ((ch1 << 8) + (ch2 << 0));
     }
     
-    default int[] readShorts(int count) throws IOException {
-        int[] arr = new int[count];
+    default short[] readShorts(int count) throws IOException {
+        short[] arr = new short[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
             arr[i] = readShort();
         }
@@ -140,8 +140,8 @@ public interface IFullyReader extends DataInput, Closeable {
         return (short) ((ch1 << 0) + (ch2 << 8));
     }
     
-    default int[] readShortExs(int count) throws IOException {
-        int[] arr = new int[count];
+    default short[] readShortExs(int count) throws IOException {
+        short[] arr = new short[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
             arr[i] = readShortEx();
         }
