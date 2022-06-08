@@ -7,17 +7,22 @@ public class XorInputStream extends InputStream {
     
     private final InputStream in;
     
-    private final byte[] keys;
+    private final int[] keys;
     
     private int index;
     
-    public XorInputStream(InputStream in, byte... keys) {
+    public XorInputStream(InputStream in, int... keys) {
         this.in = in;
         this.keys = keys;
     }
     
     @Override
     public int read() throws IOException {
-        return in.read() ^ keys[(index++) % keys.length];
+        int val = in.read();
+        if (val == -1) {
+            return -1;
+        }
+        val ^= keys[(index++) % keys.length];
+        return val;
     }
 }

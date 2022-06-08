@@ -34,6 +34,16 @@ public interface IFullyWriter extends DataOutput, Closeable {
         }
     }
     
+    default void writeUnsignedByte(short v) throws IOException {
+        writeByte(v);
+    }
+    
+    default void writeUnsignedBytes(short[] arr) throws IOException {
+        for (short b : arr) {
+            writeUnsignedByte(b);
+        }
+    }
+    
     @Override
     default void writeShort(int v) throws IOException {
         write((v >>> 8) & 0xFF);
@@ -114,9 +124,9 @@ public interface IFullyWriter extends DataOutput, Closeable {
         write((v >>> 24) & 0xFF);
     }
     
-    default void writeIntEx(int[] arr) throws IOException {
+    default void writeIntExs(int[] arr) throws IOException {
         for (int b : arr) {
-            writeInt(b);
+            writeIntEx(b);
         }
     }
     

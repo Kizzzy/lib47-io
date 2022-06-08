@@ -102,10 +102,10 @@ public interface IFullyReader extends DataInput, Closeable {
         return ch;
     }
     
-    default int[] readUnsignedBytes(int count) throws IOException {
-        int[] arr = new int[count];
+    default short[] readUnsignedBytes(int count) throws IOException {
+        short[] arr = new short[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = read();
+            arr[i] = (short) readUnsignedByte();
         }
         return arr;
     }
