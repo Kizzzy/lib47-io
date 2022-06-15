@@ -227,11 +227,22 @@ public interface IFullyWriter extends DataOutput, Closeable {
     }
     
     default void writeString(String s) throws IOException {
-        writeString(s, StandardCharsets.UTF_8);
+        writeString(s, StandardCharsets.UTF_8, false);
+    }
+    
+    default void writeString(String s, boolean appendZero) throws IOException {
+        writeString(s, StandardCharsets.UTF_8, appendZero);
     }
     
     default void writeString(String s, Charset charset) throws IOException {
+        writeString(s, charset, false);
+    }
+    
+    default void writeString(String s, Charset charset, boolean appendZero) throws IOException {
         write(s.getBytes(charset));
+        if (appendZero) {
+            write(0);
+        }
     }
     
     OutputStream asOutputStream();

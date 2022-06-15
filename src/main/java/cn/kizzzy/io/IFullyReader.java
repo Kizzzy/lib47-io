@@ -354,6 +354,14 @@ public interface IFullyReader extends DataInput, Closeable {
         return DataInputStream.readUTF(this);
     }
     
+    default String readString() throws IOException {
+        StringBuilder builder = new StringBuilder();
+        for (int val = read(); !(val == 0 || val == -1); val = read()) {
+            builder.append((char) val);
+        }
+        return builder.toString();
+    }
+    
     default String readString(int count) throws IOException {
         return readString(count, 0, StandardCharsets.UTF_8);
     }
