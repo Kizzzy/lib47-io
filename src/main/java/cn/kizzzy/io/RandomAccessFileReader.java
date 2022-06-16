@@ -1,11 +1,16 @@
 package cn.kizzzy.io;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public class RandomAccessFileReader extends FullyReader {
     
     private final RandomAccessFile file;
+    
+    public RandomAccessFileReader(String path) throws FileNotFoundException {
+        this(new RandomAccessFile(path, "r"));
+    }
     
     public RandomAccessFileReader(RandomAccessFile file) {
         this.file = file;

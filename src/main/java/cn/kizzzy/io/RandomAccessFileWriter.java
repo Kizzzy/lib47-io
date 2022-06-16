@@ -7,8 +7,13 @@ public class RandomAccessFileWriter extends FullyWriter {
     
     private final RandomAccessFile file;
     
-    public RandomAccessFileWriter(RandomAccessFile file) {
+    public RandomAccessFileWriter(String path) throws IOException {
+        this(new RandomAccessFile(path, "rw"));
+    }
+    
+    public RandomAccessFileWriter(RandomAccessFile file) throws IOException {
         this.file = file;
+        file.setLength(0);
     }
     
     @Override
