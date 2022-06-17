@@ -30,9 +30,9 @@ public class InputStreamReader extends FullyReader {
     public int read() throws IOException {
         int n = read(buffer_0);
         if (n > 0) {
-            return buffer_0[0];
+            return buffer_0[0] & 0xFF;
         }
-        return n;
+        return -1;
     }
     
     @Override
