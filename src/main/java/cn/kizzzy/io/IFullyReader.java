@@ -11,6 +11,10 @@ import java.nio.charset.StandardCharsets;
 
 public interface IFullyReader extends DataInput, Closeable {
     
+    boolean isLittleEndian();
+    
+    void setLittleEndian(boolean littleEndian);
+    
     long length() throws IOException;
     
     long position() throws IOException;
@@ -24,6 +28,12 @@ public interface IFullyReader extends DataInput, Closeable {
     }
     
     int read(byte[] b, int off, int len) throws IOException;
+    
+    default byte[] readAll() throws IOException {
+        byte[] buf = new byte[(int) length()];
+        read(buf);
+        return buf;
+    }
     
     @Override
     default int skipBytes(int n) throws IOException {
@@ -82,10 +92,7 @@ public interface IFullyReader extends DataInput, Closeable {
     
     @Override
     default byte readByte() throws IOException {
-        int ch = read();
-        if (ch < 0)
-            throw new EOFException();
-        return (byte) (ch);
+        return (byte) readUnsignedByte();
     }
     
     default byte[] readBytes(int count) throws IOException {
@@ -111,12 +118,25 @@ public interface IFullyReader extends DataInput, Closeable {
     }
     
     @Override
-    default short readShort() throws IOException {
+    default char readChar() throws IOException {
         int ch1 = read();
         int ch2 = read();
         if ((ch1 | ch2) < 0)
             throw new EOFException();
-        return (short) ((ch1 << 8) + (ch2 << 0));
+        return (char) ((ch1 << 8) + (ch2 << 0));
+    }
+    
+    default char[] readChars(int count) throws IOException {
+        char[] arr = new char[count];
+        for (int i = 0, n = arr.length; i < n; ++i) {
+            arr[i] = readChar();
+        }
+        return arr;
+    }
+    
+    @Override
+    default short readShort() throws IOException {
+        return (short) readUnsignedShort();
     }
     
     default short[] readShorts(int count) throws IOException {
@@ -127,34 +147,17 @@ public interface IFullyReader extends DataInput, Closeable {
         return arr;
     }
     
-    /**
-     * Ex suffix means method will handle bytes in LITTLE_ENDIAN style
-     *
-     * @see IFullyReader#readShort()
-     */
-    default short readShortEx() throws IOException {
-        int ch1 = this.read();
-        int ch2 = this.read();
-        if ((ch1 | ch2) < 0)
-            throw new EOFException();
-        return (short) ((ch1 << 0) + (ch2 << 8));
-    }
-    
-    default short[] readShortExs(int count) throws IOException {
-        short[] arr = new short[count];
-        for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readShortEx();
-        }
-        return arr;
-    }
-    
     @Override
     default int readUnsignedShort() throws IOException {
         int ch1 = read();
         int ch2 = read();
         if ((ch1 | ch2) < 0)
             throw new EOFException();
-        return (ch1 << 8) + (ch2 << 0);
+        if (isLittleEndian()) {
+            return (ch1 << 0) + (ch2 << 8);
+        } else {
+            return (ch1 << 8) + (ch2 << 0);
+        }
     }
     
     default int[] readUnsignedShorts(int count) throws IOException {
@@ -165,45 +168,9 @@ public interface IFullyReader extends DataInput, Closeable {
         return arr;
     }
     
-    /**
-     * Ex suffix means method will handle bytes in LITTLE_ENDIAN style
-     *
-     * @see DataInput#readShort()
-     */
-    default int readUnsignedShortEx() throws IOException {
-        int ch1 = this.read();
-        int ch2 = this.read();
-        if ((ch1 | ch2) < 0)
-            throw new EOFException();
-        return (ch1 << 0) + (ch2 << 8);
-    }
-    
-    default int[] readUnsignedShortExs(int count) throws IOException {
-        int[] arr = new int[count];
-        for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readUnsignedShortEx();
-        }
-        return arr;
-    }
-    
-    @Override
-    default char readChar() throws IOException {
-        int ch1 = read();
-        int ch2 = read();
-        if ((ch1 | ch2) < 0)
-            throw new EOFException();
-        return (char) ((ch1 << 8) + (ch2 << 0));
-    }
-    
     @Override
     default int readInt() throws IOException {
-        int ch1 = read();
-        int ch2 = read();
-        int ch3 = read();
-        int ch4 = read();
-        if ((ch1 | ch2 | ch3 | ch4) < 0)
-            throw new EOFException();
-        return ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
+        return (int) readUnsignedInt();
     }
     
     default int[] readInts(int count) throws IOException {
@@ -214,11 +181,18 @@ public interface IFullyReader extends DataInput, Closeable {
         return arr;
     }
     
-    /**
-     * @see DataInput#readInt() ()
-     */
     default long readUnsignedInt() throws IOException {
-        return readInt() & 0xffffffffL;
+        long ch1 = read();
+        long ch2 = read();
+        long ch3 = read();
+        long ch4 = read();
+        if ((ch1 | ch2 | ch3 | ch4) < 0)
+            throw new EOFException();
+        if (isLittleEndian()) {
+            return ((ch1 << 0) + (ch2 << 8) + (ch3 << 16) + (ch4 << 24));
+        } else {
+            return ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
+        }
     }
     
     default long[] readUnsignedInts(int count) throws IOException {
@@ -229,67 +203,19 @@ public interface IFullyReader extends DataInput, Closeable {
         return arr;
     }
     
-    /**
-     * Ex suffix means method will handle bytes in LITTLE_ENDIAN style
-     *
-     * @see DataInput#readInt()
-     */
-    default int readIntEx() throws IOException {
-        int ch1 = this.read();
-        int ch2 = this.read();
-        int ch3 = this.read();
-        int ch4 = this.read();
-        if ((ch1 | ch2 | ch3 | ch4) < 0)
-            throw new EOFException();
-        return ((ch1 << 0) + (ch2 << 8) + (ch3 << 16) + (ch4 << 24));
-    }
-    
-    default int[] readIntExs(int count) throws IOException {
-        int[] arr = new int[count];
-        for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readIntEx();
-        }
-        return arr;
-    }
-    
-    /**
-     * Ex suffix means method will handle bytes in LITTLE_ENDIAN style
-     *
-     * @see IFullyReader#readUnsignedInt()
-     */
-    default long readUnsignedIntEx() throws IOException {
-        return readIntEx() & 0xffffffffL;
-    }
-    
-    default long[] readUnsignedIntExs(int count) throws IOException {
-        long[] arr = new long[count];
-        for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readUnsignedIntEx();
-        }
-        return arr;
-    }
-    
     @Override
     default long readLong() throws IOException {
-        return ((long) (readInt()) << 32) + (readInt() & 0xFFFFFFFFL);
+        if (isLittleEndian()) {
+            return (this.readInt() & 0xFFFFFFFFL) + (((long) this.readInt()) << 32);
+        } else {
+            return ((long) (readInt()) << 32) + (readInt() & 0xFFFFFFFFL);
+        }
     }
     
     default long[] readLongs(int count) throws IOException {
         long[] arr = new long[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
             arr[i] = readLong();
-        }
-        return arr;
-    }
-    
-    default long readLongEx() throws IOException {
-        return (readIntEx() & 0xFFFFFFFFL) + (((long) readIntEx()) << 32);
-    }
-    
-    default long[] readLongExs(int count) throws IOException {
-        long[] arr = new long[count];
-        for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readLongEx();
         }
         return arr;
     }
@@ -307,23 +233,6 @@ public interface IFullyReader extends DataInput, Closeable {
         return arr;
     }
     
-    /**
-     * Ex suffix means method will handle bytes in LITTLE_ENDIAN style
-     *
-     * @see DataInput#readFloat()
-     */
-    default float readFloatEx() throws IOException {
-        return Float.intBitsToFloat(readIntEx());
-    }
-    
-    default float[] readFloatExs(int count) throws IOException {
-        float[] arr = new float[count];
-        for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readFloatEx();
-        }
-        return arr;
-    }
-    
     @Override
     default double readDouble() throws IOException {
         return Double.longBitsToDouble(readLong());
@@ -333,18 +242,6 @@ public interface IFullyReader extends DataInput, Closeable {
         double[] arr = new double[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
             arr[i] = readDouble();
-        }
-        return arr;
-    }
-    
-    default double readDoubleEx() throws IOException {
-        return Double.longBitsToDouble(readLongEx());
-    }
-    
-    default double[] readDoubleExs(int count) throws IOException {
-        double[] arr = new double[count];
-        for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readDoubleEx();
         }
         return arr;
     }
@@ -388,7 +285,7 @@ public interface IFullyReader extends DataInput, Closeable {
     
     @Override
     default String readLine() throws IOException {
-        StringBuffer input = new StringBuffer();
+        StringBuilder input = new StringBuilder();
         int c = -1;
         boolean eol = false;
         

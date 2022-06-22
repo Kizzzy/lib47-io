@@ -6,8 +6,20 @@ import java.io.InputStream;
 
 public class ByteArrayInputStreamReader extends ByteArrayInputStream implements IFullyReader {
     
+    private boolean littleEndian = false;
+    
     public ByteArrayInputStreamReader(byte[] buf) {
         super(buf);
+    }
+    
+    @Override
+    public boolean isLittleEndian() {
+        return littleEndian;
+    }
+    
+    @Override
+    public void setLittleEndian(boolean littleEndian) {
+        this.littleEndian = littleEndian;
     }
     
     @Override

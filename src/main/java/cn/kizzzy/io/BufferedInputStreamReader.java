@@ -8,9 +8,21 @@ public class BufferedInputStreamReader extends BufferedInputStream implements IF
     
     private final long size;
     
+    private boolean littleEndian = false;
+    
     public BufferedInputStreamReader(InputStream in, long size) {
         super(in, (int) size);
         this.size = size;
+    }
+    
+    @Override
+    public boolean isLittleEndian() {
+        return littleEndian;
+    }
+    
+    @Override
+    public void setLittleEndian(boolean littleEndian) {
+        this.littleEndian = littleEndian;
     }
     
     @Override

@@ -7,10 +7,11 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-/**
- * Ex suffix means method will handle bytes in LITTLE_ENDIAN
- */
 public interface IFullyWriter extends DataOutput, Closeable {
+    
+    boolean isLittleEndian();
+    
+    void setLittleEndian(boolean littleEndian);
     
     @Override
     default void writeBoolean(boolean v) throws IOException {
@@ -30,7 +31,7 @@ public interface IFullyWriter extends DataOutput, Closeable {
     
     default void writeBytes(byte[] arr) throws IOException {
         for (byte b : arr) {
-            write(b);
+            writeByte(b);
         }
     }
     
@@ -45,25 +46,31 @@ public interface IFullyWriter extends DataOutput, Closeable {
     }
     
     @Override
-    default void writeShort(int v) throws IOException {
+    default void writeChar(int v) throws IOException {
         write((v >>> 8) & 0xFF);
         write((v >>> 0) & 0xFF);
+    }
+    
+    default void writeChars(char[] arr) throws IOException {
+        for (int i = 0, n = arr.length; i < n; ++i) {
+            writeChar(arr[i]);
+        }
+    }
+    
+    @Override
+    default void writeShort(int v) throws IOException {
+        if (isLittleEndian()) {
+            write(v & 0xff);
+            write((v >> 8) & 0xff);
+        } else {
+            write((v >>> 8) & 0xFF);
+            write((v >>> 0) & 0xFF);
+        }
     }
     
     default void writeShorts(short[] arr) throws IOException {
         for (short b : arr) {
             writeShort(b);
-        }
-    }
-    
-    default void writeShortEx(short v) throws IOException {
-        write(v & 0xff);
-        write((v >> 8) & 0xff);
-    }
-    
-    default void writeShortExs(short[] arr) throws IOException {
-        for (short b : arr) {
-            writeShortEx(b);
         }
     }
     
@@ -77,28 +84,19 @@ public interface IFullyWriter extends DataOutput, Closeable {
         }
     }
     
-    default void writeUnsignedShortEx(int v) throws IOException {
-        writeShortEx((short) v);
-    }
-    
-    default void writeUnsignedShortExs(int[] arr) throws IOException {
-        for (int b : arr) {
-            writeUnsignedShortEx(b);
-        }
-    }
-    
-    @Override
-    default void writeChar(int v) throws IOException {
-        write((v >>> 8) & 0xFF);
-        write((v >>> 0) & 0xFF);
-    }
-    
     @Override
     default void writeInt(int v) throws IOException {
-        write((v >>> 24) & 0xFF);
-        write((v >>> 16) & 0xFF);
-        write((v >>> 8) & 0xFF);
-        write((v >>> 0) & 0xFF);
+        if (isLittleEndian()) {
+            write((v >>> 0) & 0xFF);
+            write((v >>> 8) & 0xFF);
+            write((v >>> 16) & 0xFF);
+            write((v >>> 24) & 0xFF);
+        } else {
+            write((v >>> 24) & 0xFF);
+            write((v >>> 16) & 0xFF);
+            write((v >>> 8) & 0xFF);
+            write((v >>> 0) & 0xFF);
+        }
     }
     
     default void writeInts(int[] arr) throws IOException {
@@ -117,49 +115,20 @@ public interface IFullyWriter extends DataOutput, Closeable {
         }
     }
     
-    default void writeIntEx(int v) throws IOException {
-        write((v >>> 0) & 0xFF);
-        write((v >>> 8) & 0xFF);
-        write((v >>> 16) & 0xFF);
-        write((v >>> 24) & 0xFF);
-    }
-    
-    default void writeIntExs(int[] arr) throws IOException {
-        for (int b : arr) {
-            writeIntEx(b);
-        }
-    }
-    
-    default void writeUnsignedIntEx(long value) throws IOException {
-        writeIntEx((int) value);
-    }
-    
-    default void writeUnsignedIntExs(long[] arr) throws IOException {
-        for (long b : arr) {
-            writeUnsignedIntEx(b);
-        }
-    }
-    
     @Override
     default void writeLong(long v) throws IOException {
-        writeInt((int) (v & 0xffffffffL));
-        writeInt((int) ((v >> 32) & 0xffffffffL));
+        if (isLittleEndian()) {
+            this.writeInt((int) (v & 0xffffffffL));
+            this.writeInt((int) ((v >> 32) & 0xffffffffL));
+        } else {
+            writeInt((int) ((v >> 32) & 0xffffffffL));
+            writeInt((int) (v & 0xffffffffL));
+        }
     }
     
     default void writeLongs(long[] arr) throws IOException {
         for (long b : arr) {
             writeLong(b);
-        }
-    }
-    
-    default void writeLongEx(long v) throws IOException {
-        writeIntEx((int) (v & 0xffffffffL));
-        writeIntEx((int) ((v >> 32) & 0xffffffffL));
-    }
-    
-    default void writeLongExs(long[] arr) throws IOException {
-        for (long b : arr) {
-            writeLongEx(b);
         }
     }
     
@@ -174,16 +143,6 @@ public interface IFullyWriter extends DataOutput, Closeable {
         }
     }
     
-    default void writeFloatEx(float v) throws IOException {
-        writeIntEx(Float.floatToIntBits(v));
-    }
-    
-    default void writeFloatExs(float[] arr) throws IOException {
-        for (float b : arr) {
-            writeFloatEx(b);
-        }
-    }
-    
     @Override
     default void writeDouble(double v) throws IOException {
         writeLong(Double.doubleToLongBits(v));
@@ -192,16 +151,6 @@ public interface IFullyWriter extends DataOutput, Closeable {
     default void writeDoubles(double[] arr) throws IOException {
         for (double b : arr) {
             writeDouble(b);
-        }
-    }
-    
-    default void writeDoubleEx(double v) throws IOException {
-        writeLongEx(Double.doubleToLongBits(v));
-    }
-    
-    default void writeDoubleExs(double[] arr) throws IOException {
-        for (double b : arr) {
-            writeDoubleEx(b);
         }
     }
     
