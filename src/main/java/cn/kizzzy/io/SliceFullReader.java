@@ -1,5 +1,6 @@
 package cn.kizzzy.io;
 
+import java.io.EOFException;
 import java.io.IOException;
 
 public class SliceFullReader extends FullyReader {
@@ -35,6 +36,10 @@ public class SliceFullReader extends FullyReader {
     @Override
     public int read() throws IOException {
         initPosition();
+        
+        if (currentInParent >= endInParent) {
+            throw new EOFException();
+        }
         
         int val = parent.read();
         currentInParent++;
