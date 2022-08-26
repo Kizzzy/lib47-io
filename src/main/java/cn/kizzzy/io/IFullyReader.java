@@ -314,5 +314,21 @@ public interface IFullyReader extends DataInput, Closeable {
         return input.toString();
     }
     
+    default void copyTo(IFullyWriter writer) throws IOException {
+        copyTo(writer, length());
+    }
+    
+    default void copyTo(IFullyWriter writer, long size) throws IOException {
+        if (size > length()) {
+            throw new IndexOutOfBoundsException("size is greater then size");
+        }
+        
+        byte[] buffer = new byte[8192];
+        for (int n = 0, rest = (int) size; (n = read(buffer)) > 0 && rest > 0; rest -= n) {
+            n = Math.min(n, rest);
+            writer.write(buffer, 0, n);
+        }
+    }
+    
     InputStream asInputStream();
 }
