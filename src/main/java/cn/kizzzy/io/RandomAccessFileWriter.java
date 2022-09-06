@@ -30,4 +30,21 @@ public class RandomAccessFileWriter extends FullyWriter {
     public void close() throws IOException {
         file.close();
     }
+    
+    @Override
+    public long position() throws IOException {
+        return file.getFilePointer();
+    }
+    
+    @Override
+    public void seek(long pos, SeekType seekType) throws IOException {
+        switch (seekType) {
+            case BEGIN:
+                file.seek(pos);
+                break;
+            case CURRENT:
+                file.seek(position() + pos);
+                break;
+        }
+    }
 }

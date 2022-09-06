@@ -13,6 +13,10 @@ public interface IFullyWriter extends DataOutput, Closeable {
     
     void setLittleEndian(boolean littleEndian);
     
+    long position() throws IOException;
+    
+    void seek(long pos, SeekType seekType) throws IOException;
+    
     @Override
     default void writeBoolean(boolean v) throws IOException {
         write(v ? 1 : 0);
@@ -30,9 +34,7 @@ public interface IFullyWriter extends DataOutput, Closeable {
     }
     
     default void writeBytes(byte[] arr) throws IOException {
-        for (byte b : arr) {
-            writeByte(b);
-        }
+        write(arr);
     }
     
     default void writeUnsignedByte(short v) throws IOException {
