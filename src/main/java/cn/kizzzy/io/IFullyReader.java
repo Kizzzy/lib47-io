@@ -119,41 +119,65 @@ public interface IFullyReader extends DataInput, Closeable {
     
     @Override
     default char readChar() throws IOException {
+        return readChar(isLittleEndian());
+    }
+    
+    default char readChar(boolean littleEndian) throws IOException {
         int ch1 = read();
         int ch2 = read();
         if ((ch1 | ch2) < 0)
             throw new EOFException();
-        return (char) ((ch1 << 8) + (ch2 << 0));
+        if (littleEndian) {
+            return (char) ((ch1 << 0) + (ch2 << 8));
+        } else {
+            return (char) ((ch1 << 8) + (ch2 << 0));
+        }
     }
     
     default char[] readChars(int count) throws IOException {
+        return readChars(count, isLittleEndian());
+    }
+    
+    default char[] readChars(int count, boolean littleEndian) throws IOException {
         char[] arr = new char[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readChar();
+            arr[i] = readChar(littleEndian);
         }
         return arr;
     }
     
     @Override
     default short readShort() throws IOException {
-        return (short) readUnsignedShort();
+        return readShort(isLittleEndian());
+    }
+    
+    default short readShort(boolean littleEndian) throws IOException {
+        return (short) readUnsignedShort(littleEndian);
     }
     
     default short[] readShorts(int count) throws IOException {
+        return readShorts(count, isLittleEndian());
+    }
+    
+    default short[] readShorts(int count, boolean littleEndian) throws IOException {
         short[] arr = new short[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readShort();
+            arr[i] = readShort(littleEndian);
         }
         return arr;
     }
     
     @Override
     default int readUnsignedShort() throws IOException {
+        return readUnsignedShort(isLittleEndian());
+    }
+    
+    default int readUnsignedShort(boolean littleEndian) throws IOException {
         int ch1 = read();
         int ch2 = read();
         if ((ch1 | ch2) < 0)
             throw new EOFException();
-        if (isLittleEndian()) {
+        if (littleEndian) {
             return (ch1 << 0) + (ch2 << 8);
         } else {
             return (ch1 << 8) + (ch2 << 0);
@@ -161,34 +185,50 @@ public interface IFullyReader extends DataInput, Closeable {
     }
     
     default int[] readUnsignedShorts(int count) throws IOException {
+        return readUnsignedShorts(count, isLittleEndian());
+    }
+    
+    default int[] readUnsignedShorts(int count, boolean littleEndian) throws IOException {
         int[] arr = new int[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readUnsignedShort();
+            arr[i] = readUnsignedShort(littleEndian);
         }
         return arr;
     }
     
     @Override
     default int readInt() throws IOException {
-        return (int) readUnsignedInt();
+        return readInt(isLittleEndian());
+    }
+    
+    default int readInt(boolean littleEndian) throws IOException {
+        return (int) readUnsignedInt(littleEndian);
     }
     
     default int[] readInts(int count) throws IOException {
+        return readInts(count, isLittleEndian());
+    }
+    
+    default int[] readInts(int count, boolean littleEndian) throws IOException {
         int[] arr = new int[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readInt();
+            arr[i] = readInt(littleEndian);
         }
         return arr;
     }
     
     default long readUnsignedInt() throws IOException {
+        return readUnsignedInt(isLittleEndian());
+    }
+    
+    default long readUnsignedInt(boolean littleEndian) throws IOException {
         long ch1 = read();
         long ch2 = read();
         long ch3 = read();
         long ch4 = read();
         if ((ch1 | ch2 | ch3 | ch4) < 0)
             throw new EOFException();
-        if (isLittleEndian()) {
+        if (littleEndian) {
             return ((ch1 << 0) + (ch2 << 8) + (ch3 << 16) + (ch4 << 24));
         } else {
             return ((ch1 << 24) + (ch2 << 16) + (ch3 << 8) + (ch4 << 0));
@@ -196,52 +236,80 @@ public interface IFullyReader extends DataInput, Closeable {
     }
     
     default long[] readUnsignedInts(int count) throws IOException {
+        return readUnsignedInts(count, isLittleEndian());
+    }
+    
+    default long[] readUnsignedInts(int count, boolean littleEndian) throws IOException {
         long[] arr = new long[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readUnsignedInt();
+            arr[i] = readUnsignedInt(littleEndian);
         }
         return arr;
     }
     
     @Override
     default long readLong() throws IOException {
-        if (isLittleEndian()) {
-            return (this.readInt() & 0xFFFFFFFFL) + (((long) this.readInt()) << 32);
+        return readLong(isLittleEndian());
+    }
+    
+    default long readLong(boolean littleEndian) throws IOException {
+        if (littleEndian) {
+            return (this.readInt(true) & 0xFFFFFFFFL) + (((long) this.readInt(true)) << 32);
         } else {
-            return ((long) (readInt()) << 32) + (readInt() & 0xFFFFFFFFL);
+            return ((long) (readInt(false)) << 32) + (readInt(false) & 0xFFFFFFFFL);
         }
     }
     
     default long[] readLongs(int count) throws IOException {
+        return readLongs(count, isLittleEndian());
+    }
+    
+    default long[] readLongs(int count, boolean littleEndian) throws IOException {
         long[] arr = new long[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readLong();
+            arr[i] = readLong(littleEndian);
         }
         return arr;
     }
     
     @Override
     default float readFloat() throws IOException {
-        return Float.intBitsToFloat(readInt());
+        return readFloat(isLittleEndian());
+    }
+    
+    default float readFloat(boolean littleEndian) throws IOException {
+        return Float.intBitsToFloat(readInt(littleEndian));
     }
     
     default float[] readFloats(int count) throws IOException {
+        return readFloats(count, isLittleEndian());
+    }
+    
+    default float[] readFloats(int count, boolean littleEndian) throws IOException {
         float[] arr = new float[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readFloat();
+            arr[i] = readFloat(littleEndian);
         }
         return arr;
     }
     
     @Override
     default double readDouble() throws IOException {
-        return Double.longBitsToDouble(readLong());
+        return readDouble(isLittleEndian());
+    }
+    
+    default double readDouble(boolean littleEndian) throws IOException {
+        return Double.longBitsToDouble(readLong(littleEndian));
     }
     
     default double[] readDoubles(int count) throws IOException {
+        return readDoubles(count, isLittleEndian());
+    }
+    
+    default double[] readDoubles(int count, boolean littleEndian) throws IOException {
         double[] arr = new double[count];
         for (int i = 0, n = arr.length; i < n; ++i) {
-            arr[i] = readDouble();
+            arr[i] = readDouble(littleEndian);
         }
         return arr;
     }
