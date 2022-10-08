@@ -342,7 +342,7 @@ public interface IFullyReader extends DataInput, Closeable {
     default String readString(int count, int offset, Charset charset) throws IOException {
         byte[] pathBuf = readBytes(count);
         
-        String s = new String(pathBuf, offset, count, charset);
+        String s = new String(pathBuf, offset, count - offset, charset);
         for (int i = 0, n = s.length(); i < n; ++i) {
             if (s.charAt(i) == 0) {
                 return s.substring(0, i);
