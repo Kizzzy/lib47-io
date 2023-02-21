@@ -9,13 +9,13 @@ import java.nio.charset.StandardCharsets;
 
 public interface IFullyWriter extends DataOutput, Closeable {
     
-    boolean isLittleEndian();
-    
-    void setLittleEndian(boolean littleEndian);
-    
     long position() throws IOException;
     
     void seek(long pos, SeekType seekType) throws IOException;
+    
+    /* *********************************************************
+        Boolean
+     ********************************************************* */
     
     @Override
     default void writeBoolean(boolean v) throws IOException {
@@ -23,10 +23,22 @@ public interface IFullyWriter extends DataOutput, Closeable {
     }
     
     default void writeBooleans(boolean[] arr) throws IOException {
-        for (boolean b : arr) {
-            writeBoolean(b);
+        writeBooleans(arr, 0, arr.length);
+    }
+    
+    default void writeBooleans(boolean[] arr, int off, int len) throws IOException {
+        if (off < 0 || len < 0 || (off + len) > arr.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        for (int i = 0; i < len; ++i) {
+            writeBoolean(arr[off + i]);
         }
     }
+    
+    /* *********************************************************
+        Byte
+     ********************************************************* */
     
     @Override
     default void writeByte(int v) throws IOException {
@@ -34,18 +46,38 @@ public interface IFullyWriter extends DataOutput, Closeable {
     }
     
     default void writeBytes(byte[] arr) throws IOException {
-        write(arr);
+        writeBytes(arr, 0, arr.length);
     }
+    
+    default void writeBytes(byte[] arr, int off, int len) throws IOException {
+        write(arr, off, len);
+    }
+    
+    /* *********************************************************
+        UnsignedByte
+     ********************************************************* */
     
     default void writeUnsignedByte(short v) throws IOException {
         writeByte(v);
     }
     
     default void writeUnsignedBytes(short[] arr) throws IOException {
-        for (short b : arr) {
-            writeUnsignedByte(b);
+        writeUnsignedBytes(arr, 0, arr.length);
+    }
+    
+    default void writeUnsignedBytes(short[] arr, int off, int len) throws IOException {
+        if (off < 0 || len < 0 || (off + len) > arr.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        for (int i = 0; i < len; ++i) {
+            writeUnsignedByte(arr[off + i]);
         }
     }
+    
+    /* *********************************************************
+        Char
+     ********************************************************* */
     
     @Override
     default void writeChar(int v) throws IOException {
@@ -54,16 +86,32 @@ public interface IFullyWriter extends DataOutput, Closeable {
     }
     
     default void writeChars(char[] arr) throws IOException {
-        for (int i = 0, n = arr.length; i < n; ++i) {
-            writeChar(arr[i]);
+        writeChars(arr, 0, arr.length);
+    }
+    
+    default void writeChars(char[] arr, int off, int len) throws IOException {
+        if (off < 0 || len < 0 || (off + len) > arr.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        for (int i = 0; i < len; ++i) {
+            writeChar(arr[off + i]);
         }
     }
     
+    /* *********************************************************
+        Short
+     ********************************************************* */
+    
     @Override
     default void writeShort(int v) throws IOException {
-        if (isLittleEndian()) {
-            write(v & 0xff);
-            write((v >> 8) & 0xff);
+        writeShort(v, isLittleEndian());
+    }
+    
+    default void writeShort(int v, boolean littleEndian) throws IOException {
+        if (littleEndian) {
+            write((v >>> 0) & 0xFF);
+            write((v >>> 8) & 0xff);
         } else {
             write((v >>> 8) & 0xFF);
             write((v >>> 0) & 0xFF);
@@ -71,24 +119,72 @@ public interface IFullyWriter extends DataOutput, Closeable {
     }
     
     default void writeShorts(short[] arr) throws IOException {
-        for (short b : arr) {
-            writeShort(b);
+        writeShorts(arr, isLittleEndian());
+    }
+    
+    default void writeShorts(short[] arr, boolean littleEndian) throws IOException {
+        writeShorts(arr, 0, arr.length, littleEndian);
+    }
+    
+    default void writeShorts(short[] arr, int off, int len) throws IOException {
+        writeShorts(arr, off, len, isLittleEndian());
+    }
+    
+    default void writeShorts(short[] arr, int off, int len, boolean littleEndian) throws IOException {
+        if (off < 0 || len < 0 || (off + len) > arr.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        for (int i = 0; i < len; ++i) {
+            writeShort(arr[off + i], littleEndian);
         }
     }
     
+    /* *********************************************************
+        UnsignedShort
+     ********************************************************* */
+    
     default void writeUnsignedShort(int v) throws IOException {
-        writeShort(v);
+        writeUnsignedShort(v, isLittleEndian());
+    }
+    
+    default void writeUnsignedShort(int v, boolean littleEndian) throws IOException {
+        writeShort(v, littleEndian);
     }
     
     default void writeUnsignedShorts(int[] arr) throws IOException {
-        for (int b : arr) {
-            writeUnsignedShort(b);
+        writeUnsignedShorts(arr, isLittleEndian());
+    }
+    
+    default void writeUnsignedShorts(int[] arr, boolean littleEndian) throws IOException {
+        writeUnsignedShorts(arr, 0, arr.length, littleEndian);
+    }
+    
+    default void writeUnsignedShorts(int[] arr, int off, int len) throws IOException {
+        writeUnsignedShorts(arr, off, len, isLittleEndian());
+    }
+    
+    default void writeUnsignedShorts(int[] arr, int off, int len, boolean littleEndian) throws IOException {
+        if (off < 0 || len < 0 || (off + len) > arr.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        for (int i = 0; i < len; ++i) {
+            writeUnsignedShort(arr[off + i], littleEndian);
         }
     }
     
+    /* *********************************************************
+        Int
+     ********************************************************* */
+    
     @Override
     default void writeInt(int v) throws IOException {
-        if (isLittleEndian()) {
+        writeInt(v, isLittleEndian());
+    }
+    
+    default void writeInt(int v, boolean littleEndian) throws IOException {
+        if (littleEndian) {
             write((v >>> 0) & 0xFF);
             write((v >>> 8) & 0xFF);
             write((v >>> 16) & 0xFF);
@@ -102,24 +198,72 @@ public interface IFullyWriter extends DataOutput, Closeable {
     }
     
     default void writeInts(int[] arr) throws IOException {
-        for (int b : arr) {
-            writeInt(b);
+        writeInts(arr, isLittleEndian());
+    }
+    
+    default void writeInts(int[] arr, boolean littleEndian) throws IOException {
+        writeInts(arr, 0, arr.length, littleEndian);
+    }
+    
+    default void writeInts(int[] arr, int off, int len) throws IOException {
+        writeInts(arr, off, len, isLittleEndian());
+    }
+    
+    default void writeInts(int[] arr, int off, int len, boolean littleEndian) throws IOException {
+        if (off < 0 || len < 0 || (off + len) > arr.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        for (int i = 0; i < len; ++i) {
+            writeInt(arr[off + i], littleEndian);
         }
     }
     
+    /* *********************************************************
+        UnsignedInt
+     ********************************************************* */
+    
     default void writeUnsignedInt(long v) throws IOException {
-        writeInt((int) v);
+        writeUnsignedInt(v, isLittleEndian());
+    }
+    
+    default void writeUnsignedInt(long v, boolean littleEndian) throws IOException {
+        writeInt((int) v, littleEndian);
     }
     
     default void writeUnsignedInts(long[] arr) throws IOException {
-        for (long b : arr) {
-            writeUnsignedInt(b);
+        writeUnsignedInts(arr, isLittleEndian());
+    }
+    
+    default void writeUnsignedInts(long[] arr, boolean littleEndian) throws IOException {
+        writeUnsignedInts(arr, 0, arr.length, littleEndian);
+    }
+    
+    default void writeUnsignedInts(long[] arr, int off, int len) throws IOException {
+        writeUnsignedInts(arr, off, len, isLittleEndian());
+    }
+    
+    default void writeUnsignedInts(long[] arr, int off, int len, boolean littleEndian) throws IOException {
+        if (off < 0 || len < 0 || (off + len) > arr.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        for (int i = 0; i < len; ++i) {
+            writeUnsignedInt(arr[off + i], littleEndian);
         }
     }
     
+    /* *********************************************************
+        Long
+     ********************************************************* */
+    
     @Override
     default void writeLong(long v) throws IOException {
-        if (isLittleEndian()) {
+        writeLong(v, isLittleEndian());
+    }
+    
+    default void writeLong(long v, boolean littleEndian) throws IOException {
+        if (littleEndian) {
             this.writeInt((int) (v & 0xffffffffL));
             this.writeInt((int) ((v >> 32) & 0xffffffffL));
         } else {
@@ -129,32 +273,100 @@ public interface IFullyWriter extends DataOutput, Closeable {
     }
     
     default void writeLongs(long[] arr) throws IOException {
-        for (long b : arr) {
-            writeLong(b);
+        writeLongs(arr, isLittleEndian());
+    }
+    
+    default void writeLongs(long[] arr, boolean littleEndian) throws IOException {
+        writeLongs(arr, 0, arr.length, littleEndian);
+    }
+    
+    default void writeLongs(long[] arr, int off, int len) throws IOException {
+        writeLongs(arr, off, len, isLittleEndian());
+    }
+    
+    default void writeLongs(long[] arr, int off, int len, boolean littleEndian) throws IOException {
+        if (off < 0 || len < 0 || (off + len) > arr.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        for (int i = 0; i < len; ++i) {
+            writeLong(arr[off + i], littleEndian);
         }
     }
+    
+    /* *********************************************************
+        Float
+     ********************************************************* */
     
     @Override
     default void writeFloat(float v) throws IOException {
-        writeInt(Float.floatToIntBits(v));
+        writeFloat(v, isLittleEndian());
+    }
+    
+    default void writeFloat(float v, boolean littleEndian) throws IOException {
+        writeInt(Float.floatToIntBits(v), littleEndian);
     }
     
     default void writeFloats(float[] arr) throws IOException {
-        for (float b : arr) {
-            writeFloat(b);
+        writeFloats(arr, isLittleEndian());
+    }
+    
+    default void writeFloats(float[] arr, boolean littleEndian) throws IOException {
+        writeFloats(arr, 0, arr.length, littleEndian);
+    }
+    
+    default void writeFloats(float[] arr, int off, int len) throws IOException {
+        writeFloats(arr, off, len, isLittleEndian());
+    }
+    
+    default void writeFloats(float[] arr, int off, int len, boolean littleEndian) throws IOException {
+        if (off < 0 || len < 0 || (off + len) > arr.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        for (int i = 0; i < len; ++i) {
+            writeFloat(arr[off + i], littleEndian);
         }
     }
+    
+    /* *********************************************************
+        Double
+     ********************************************************* */
     
     @Override
     default void writeDouble(double v) throws IOException {
-        writeLong(Double.doubleToLongBits(v));
+        writeDouble(v, isLittleEndian());
+    }
+    
+    default void writeDouble(double v, boolean littleEndian) throws IOException {
+        writeLong(Double.doubleToLongBits(v), littleEndian);
     }
     
     default void writeDoubles(double[] arr) throws IOException {
-        for (double b : arr) {
-            writeDouble(b);
+        writeDoubles(arr, isLittleEndian());
+    }
+    
+    default void writeDoubles(double[] arr, boolean littleEndian) throws IOException {
+        writeDoubles(arr, 0, arr.length, littleEndian);
+    }
+    
+    default void writeDoubles(double[] arr, int off, int len) throws IOException {
+        writeDoubles(arr, off, len, isLittleEndian());
+    }
+    
+    default void writeDoubles(double[] arr, int off, int len, boolean littleEndian) throws IOException {
+        if (off < 0 || len < 0 || (off + len) > arr.length) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        for (int i = 0; i < len; ++i) {
+            writeDouble(arr[off + i], littleEndian);
         }
     }
+    
+    /* *********************************************************
+        String
+     ********************************************************* */
     
     @Override
     default void writeBytes(String s) throws IOException {
@@ -195,6 +407,14 @@ public interface IFullyWriter extends DataOutput, Closeable {
             write(0);
         }
     }
+    
+    /* *********************************************************
+        Other
+     ********************************************************* */
+    
+    boolean isLittleEndian();
+    
+    void setLittleEndian(boolean littleEndian);
     
     OutputStream asOutputStream();
 }

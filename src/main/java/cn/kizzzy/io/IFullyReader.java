@@ -11,29 +11,11 @@ import java.nio.charset.StandardCharsets;
 
 public interface IFullyReader extends DataInput, Closeable {
     
-    boolean isLittleEndian();
-    
-    void setLittleEndian(boolean littleEndian);
-    
     long length() throws IOException;
     
     long position() throws IOException;
     
     void seek(long pos, SeekType seekType) throws IOException;
-    
-    int read() throws IOException;
-    
-    default int read(byte[] buffer) throws IOException {
-        return read(buffer, 0, buffer.length);
-    }
-    
-    int read(byte[] b, int off, int len) throws IOException;
-    
-    default byte[] readAll() throws IOException {
-        byte[] buf = new byte[(int) length()];
-        read(buf);
-        return buf;
-    }
     
     @Override
     default int skipBytes(int n) throws IOException {
@@ -56,6 +38,24 @@ public interface IFullyReader extends DataInput, Closeable {
         return (int) (newpos - pos);
     }
     
+    /* *********************************************************
+        Read
+     ********************************************************* */
+    
+    int read() throws IOException;
+    
+    default int read(byte[] buffer) throws IOException {
+        return read(buffer, 0, buffer.length);
+    }
+    
+    int read(byte[] b, int off, int len) throws IOException;
+    
+    default byte[] readAll() throws IOException {
+        byte[] buf = new byte[(int) length()];
+        read(buf);
+        return buf;
+    }
+    
     @Override
     default void readFully(byte[] b) throws IOException {
         readFully(b, 0, b.length);
@@ -74,6 +74,10 @@ public interface IFullyReader extends DataInput, Closeable {
         }
     }
     
+    /* *********************************************************
+        Boolean
+     ********************************************************* */
+    
     @Override
     default boolean readBoolean() throws IOException {
         int ch = this.read();
@@ -90,6 +94,10 @@ public interface IFullyReader extends DataInput, Closeable {
         return arr;
     }
     
+    /* *********************************************************
+        Byte
+     ********************************************************* */
+    
     @Override
     default byte readByte() throws IOException {
         return (byte) readUnsignedByte();
@@ -100,6 +108,10 @@ public interface IFullyReader extends DataInput, Closeable {
         readFully(arr);
         return arr;
     }
+    
+    /* *********************************************************
+        UnsignedByte
+     ********************************************************* */
     
     @Override
     default int readUnsignedByte() throws IOException {
@@ -116,6 +128,10 @@ public interface IFullyReader extends DataInput, Closeable {
         }
         return arr;
     }
+    
+    /* *********************************************************
+        Char
+     ********************************************************* */
     
     @Override
     default char readChar() throws IOException {
@@ -146,6 +162,10 @@ public interface IFullyReader extends DataInput, Closeable {
         return arr;
     }
     
+    /* *********************************************************
+        Short
+     ********************************************************* */
+    
     @Override
     default short readShort() throws IOException {
         return readShort(isLittleEndian());
@@ -166,6 +186,10 @@ public interface IFullyReader extends DataInput, Closeable {
         }
         return arr;
     }
+    
+    /* *********************************************************
+        UnsignedShort
+     ********************************************************* */
     
     @Override
     default int readUnsignedShort() throws IOException {
@@ -196,6 +220,10 @@ public interface IFullyReader extends DataInput, Closeable {
         return arr;
     }
     
+    /* *********************************************************
+        Int
+     ********************************************************* */
+    
     @Override
     default int readInt() throws IOException {
         return readInt(isLittleEndian());
@@ -216,6 +244,10 @@ public interface IFullyReader extends DataInput, Closeable {
         }
         return arr;
     }
+    
+    /* *********************************************************
+        UnsignedInt
+     ********************************************************* */
     
     default long readUnsignedInt() throws IOException {
         return readUnsignedInt(isLittleEndian());
@@ -247,6 +279,10 @@ public interface IFullyReader extends DataInput, Closeable {
         return arr;
     }
     
+    /* *********************************************************
+        Long
+     ********************************************************* */
+    
     @Override
     default long readLong() throws IOException {
         return readLong(isLittleEndian());
@@ -272,6 +308,10 @@ public interface IFullyReader extends DataInput, Closeable {
         return arr;
     }
     
+    /* *********************************************************
+        Float
+     ********************************************************* */
+    
     @Override
     default float readFloat() throws IOException {
         return readFloat(isLittleEndian());
@@ -293,6 +333,10 @@ public interface IFullyReader extends DataInput, Closeable {
         return arr;
     }
     
+    /* *********************************************************
+        Double
+     ********************************************************* */
+    
     @Override
     default double readDouble() throws IOException {
         return readDouble(isLittleEndian());
@@ -313,6 +357,10 @@ public interface IFullyReader extends DataInput, Closeable {
         }
         return arr;
     }
+    
+    /* *********************************************************
+        String
+     ********************************************************* */
     
     @Override
     default String readUTF() throws IOException {
@@ -382,6 +430,10 @@ public interface IFullyReader extends DataInput, Closeable {
         return input.toString();
     }
     
+    /* *********************************************************
+        Transfer
+     ********************************************************* */
+    
     default void copyTo(IFullyWriter writer) throws IOException {
         copyTo(writer, length());
     }
@@ -397,6 +449,14 @@ public interface IFullyReader extends DataInput, Closeable {
             writer.write(buffer, 0, n);
         }
     }
+    
+    /* *********************************************************
+        Other
+     ********************************************************* */
+    
+    boolean isLittleEndian();
+    
+    void setLittleEndian(boolean littleEndian);
     
     InputStream asInputStream();
 }
