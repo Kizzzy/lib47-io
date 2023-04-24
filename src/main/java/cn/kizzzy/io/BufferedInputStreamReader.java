@@ -10,7 +10,7 @@ public class BufferedInputStreamReader extends BufferedInputStream implements IF
     
     private boolean littleEndian = false;
     
-    public BufferedInputStreamReader(InputStream in, long size) {
+    public BufferedInputStreamReader(FullyReader in, long size) {
         super(in, (int) size);
         this.size = size;
     }
