@@ -6,13 +6,13 @@ import java.io.InputStream;
 
 public class BufferedInputStreamReader extends BufferedInputStream implements IFullyReader {
     
-    private final long size;
+    private final IFullyReader reader;
     
     private boolean littleEndian = false;
     
-    public BufferedInputStreamReader(FullyReader in, long size) {
-        super(in, (int) size);
-        this.size = size;
+    public BufferedInputStreamReader(FullyReader in) {
+        super(in);
+        this.reader = in;
     }
     
     @Override
@@ -27,22 +27,20 @@ public class BufferedInputStreamReader extends BufferedInputStream implements IF
     
     @Override
     public long length() throws IOException {
-        return size;
+        return reader.length();
     }
     
     @Override
     public long position() throws IOException {
-        return pos;
+        return reader.position();
     }
     
     @Override
     public void seek(long pos, SeekType seekType) throws IOException {
-        switch (seekType) {
-            case BEGIN:
-                this.pos = (int) pos;
-            case CURRENT:
-                skip(pos);
-        }
+        reader.seek(pos, seekType);
+        
+        this.pos = 0;
+        this.count = 0;
     }
     
     @Override
