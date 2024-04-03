@@ -458,5 +458,17 @@ public interface IFullyReader extends DataInput, Closeable {
     
     void setLittleEndian(boolean littleEndian);
     
+    default void align() throws IOException {
+        align(4);
+    }
+    
+    default void align(int alignment) throws IOException {
+        long position = position();
+        long mod = position % alignment;
+        if (mod != 0) {
+            seek(alignment - mod, SeekType.CURRENT);
+        }
+    }
+    
     InputStream asInputStream();
 }
