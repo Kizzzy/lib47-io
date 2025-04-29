@@ -399,6 +399,15 @@ public interface IFullyReader extends DataInput, Closeable {
         return s;
     }
     
+    default String readString_auto() throws IOException {
+        return readString_auto(StandardCharsets.UTF_8);
+    }
+    
+    default String readString_auto(Charset charset) throws IOException {
+        int len = readInt();
+        return readString(len, charset);
+    }
+    
     @Override
     default String readLine() throws IOException {
         StringBuilder input = new StringBuilder();
